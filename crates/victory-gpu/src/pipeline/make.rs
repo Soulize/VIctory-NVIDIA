@@ -72,8 +72,8 @@ fn left_out(shaders: &[Arc<Shader>]) -> Option<&'static str> {
             return false;
         }
         // Without BVH, ~1,000 CS_RaytracingResolve shaders shade no hits while
-        // clogging the cold compiler queue; skip unless VICTORY_RT_RESOLVE=1.
-        std::env::var_os("VICTORY_RT_RESOLVE").is_none_or(|v| v == "0")
+        // clogging the cold compiler queue; skip only with VICTORY_RT_RESOLVE=0.
+        std::env::var_os("VICTORY_RT_RESOLVE").is_some_and(|v| v == "0")
     });
     if skip_rt && named(shaders, b"CS_RaytracingResolve") {
         return Some("shades ray-tracing hits without BVH, left out");
@@ -84,7 +84,7 @@ fn left_out(shaders: &[Arc<Shader>]) -> Option<&'static str> {
         if builder {
             return std::env::var_os("VICTORY_ACTIVATE_RAYS").is_some_and(|v| v == "0");
         }
-        std::env::var_os("VICTORY_ACTIVATE_RAYS").is_none_or(|v| v == "0")
+        std::env::var_os("VICTORY_ACTIVATE_RAYS").is_some_and(|v| v == "0")
     });
     if skip_activate && named(shaders, b"CS_ScreenProbes_ActivateRays") {
         return Some("ray activation shader without BVH, left out");

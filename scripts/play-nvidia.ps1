@@ -5,6 +5,7 @@
 # -SeriesX         the Series X profile instead (slower: about 7 fps at half scale)
 # -Quality         fewer stretched/jumping bodies and less rainbow skin, at about 13 fps instead of about 20
 # -RayTracing      keep the title's ray-tracing passes (off by default: see below)
+# -ParetoResidency  enable cool_fox's demand-driven texture levels and 64 KiB card-buffer threshold (experimental).
 # -Resolution      the height the game renders at before the title's own upscaler: 2160, 1440, 1080, 720, 540 or 480.
 #                  Series S outputs 1080p (so up to 1080 there), Series X 2160p. Default: half the output (540 on S,
 #                  1080 on X). The play-S-*.ps1 and play-X-*.ps1 scripts next to this one call it with each.
@@ -20,6 +21,7 @@ param(
     [switch]$SeriesX,
     [switch]$Quality,
     [switch]$RayTracing,
+    [switch]$ParetoResidency,
     [ValidateSet('2160', '1440', '1080', '720', '540', '480')][string]$Resolution,
     [string]$Adapter,
     [ValidateSet('diag', 'release')][string]$Build = 'diag',
@@ -64,6 +66,15 @@ $rtList = Join-Path $PSScriptRoot 'rt_off_hashes.txt'
 if (-not $RayTracing -and (Test-Path $rtList)) {
     $settings.VICTORY_SKIP_PIPELINES = (Get-Content $rtList -Raw).Trim()
 }
+if ($ParetoResidency) {
+    $settings.VICTORY_LEVELS_ON_DEMAND = '1'
+    $settings.VICTORY_CARD_BUFFERS_MIN_KB = '64'
+    $settings.VICTORY_PLANE_PREMULTIPLIED = '1'
+    if (-not $RayTracing) { $settings.VICTORY_RT_RESOLVE = '0' }
+}
+# Keep ray activation enabled: disabling it can leave corrupt lighting on NVIDIA.
+$settings.VICTORY_ACTIVATE_RAYS = '1'
+if ($RayTracing) { $settings.VICTORY_RT_RESOLVE = '1' }
 if ($Quality) {
     # Stretched/jumping bodies: relay stage 1 and no card steps (avatarmanz/VIctory-7900XTX issue 13,
     # fxceless/victory-fork issue 89). Rainbow skin: texture refreshes wait for the runtime's remapping.
