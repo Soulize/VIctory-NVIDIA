@@ -369,3 +369,8 @@ commits taken from elsewhere name the commit and its author.
 
 GPL-3.0-or-later, as VIctory. See [LICENSE](LICENSE); the one file that is not
 covered is named in [docs/asset-policy.md](docs/asset-policy.md).
+
+
+## Experimental cool_fox integration
+
+The [integration notes](docs/cool-fox-port.md) document the upstream snapshot, NVIDIA-specific reconciliation and verification plan. Use `scripts/play-nvidia.ps1 -Exe <path> -ParetoResidency` to opt in to the experimental residency preset; omit that switch for the existing NVIDIA defaults. The port has not been benchmarked on an NVIDIA GPU.
